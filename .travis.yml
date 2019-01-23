@@ -1,0 +1,16 @@
+dist: trusty
+group: edge
+
+sudo: true
+
+language: bash
+
+branches:
+  only:
+  - master
+  - develop
+
+script:
+  - echo "something"
+  - ls -al ~/.ssh/
+

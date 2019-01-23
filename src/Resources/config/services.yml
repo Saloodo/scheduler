@@ -1,0 +1,23 @@
+services:
+  Saloodo\Scheduler\Jobs\Mutex\SchedulerLocker:
+    public: true
+    arguments:
+        - 'scheduler.cache_driver'
+
+  Saloodo\Scheduler\Jobs\Mutex\JobLocker:
+    public: true
+    arguments:
+        - 'scheduler.cache_driver'
+
+  Saloodo\Scheduler\Jobs\Scheduler:
+    public: true
+    arguments:
+      - '@event_dispatcher'
+      - '@Saloodo\Scheduler\Jobs\Mutex\SchedulerLocker'
+      - '@Saloodo\Scheduler\Jobs\Mutex\JobLocker'
+
+  Saloodo\Scheduler\Command\ListCommand:
+    tags: ['console.command']
+
+  Saloodo\Scheduler\Command\RunCommand:
+      tags: ['console.command']

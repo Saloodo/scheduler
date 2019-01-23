@@ -1,0 +1,27 @@
+{
+  "name": "saloodo/scheduler",
+  "description": "Job Scheduler Bundle",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Saloodo\\Scheduler\\": "src/"
+    }
+  },
+  "require": {
+    "symfony/framework-bundle": "~3.0|~4.0",
+    "dragonmantank/cron-expression": "^2.0",
+    "symfony/process": "~3.0|~4.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7.0",
+    "symfony/phpunit-bridge": "^3.0",
+    "sensio/framework-extra-bundle": "^3.0.2",
+    "monolog/monolog": "^1.23"
+  },
+  "authors": [
+    {
+      "name": "Leonardo Beal",
+      "email": "leonardo.beal@saloodo.com"
+    }
+  ]
+}
