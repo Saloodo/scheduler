@@ -128,6 +128,8 @@ this is the  MAX time that the lock would be held. In normal conditions, after t
 ### Job frequency
 
 ```php
+$scheduler->everyMinute(); // runs job every minute
+
 $scheduler->everyFiveMinutes(); // runs job every 5 minutes
 
 $scheduler->everyTenMinutes(); // runs job every 10 minutes
