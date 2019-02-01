@@ -173,28 +173,28 @@ class Schedule
      * @param $currentTime
      * @return bool
      */
-    public function isDue($currentTime = 'now')
+    public function isDue($currentTime = 'now'): bool
     {
         return $this->cron->isDue($currentTime);
     }
 
     /**
-     * Whether the job should run on just one instance
+     * Sets whether the job should run on just one instance
      * @param bool $decision
      * @return $this
      */
-    public function shouldRunOnOnlyOneInstance(bool $decision = true)
+    public function shouldRunOnOnlyOneInstance(bool $decision = true): self
     {
         $this->shouldRunOnOnlyOneServer = $decision;
         return $this;
     }
 
     /**
-     * Whether the job can overlap
+     * Sets whether the job can overlap
      * @param bool $decision
      * @return $this
      */
-    public function canOverlap(bool $decision = true)
+    public function canOverlap(bool $decision = true): self
     {
         $this->canOverlap = $decision;
         return $this;
@@ -205,22 +205,32 @@ class Schedule
      * @param int $ttl
      * @return $this
      */
-    public function setTtl(int $ttl)
+    public function setTtl(int $ttl): self
     {
         $this->ttl = $ttl;
         return $this;
     }
 
+    /**
+     * @return int
+     */
     public function getTtl(): int
     {
         return $this->ttl;
     }
-    
+
+    /** Check whether the job should run on just one instance
+     * @return bool
+     */
     public function checkShouldRunOnOnlyOneInstance(): bool
     {
         return $this->shouldRunOnOnlyOneServer;
     }
 
+    /**
+     * Check whether the job can overlap
+     * @return bool
+     */
     public function checkCanOverlap(): bool
     {
         return $this->canOverlap;

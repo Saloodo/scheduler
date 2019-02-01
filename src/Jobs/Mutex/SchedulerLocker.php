@@ -17,6 +17,9 @@ class SchedulerLocker implements LockInterface
         $this->cache = $cache;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function tryLock(JobInterface $job, DateTimeInterface $time = null): bool
     {
         if (!$time) {
@@ -41,6 +44,9 @@ class SchedulerLocker implements LockInterface
         return $this->cache->save($info);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function unlock(JobInterface $job)
     {
         // TODO: Implement unlock() method.

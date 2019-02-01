@@ -9,7 +9,6 @@ use Saloodo\Scheduler\Event\JobSkippedEvent;
 use Saloodo\Scheduler\Event\JobStartedEvent;
 use Saloodo\Scheduler\Jobs\Mutex\JobLocker;
 use Saloodo\Scheduler\Jobs\Mutex\SchedulerLocker;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Scheduler
