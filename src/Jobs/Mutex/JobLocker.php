@@ -19,12 +19,8 @@ class JobLocker implements LockInterface
         $this->cache = $cache;
     }
 
-    public function tryLock(JobInterface $job, $time = null): bool
+    public function tryLock(JobInterface $job): bool
     {
-        if (!$time) {
-            $time = new DateTimeImmutable();
-        }
-
         $info = $this->cache->getItem($job->getUniqueId());
 
         if ($info->isHit()) {
@@ -35,7 +31,7 @@ class JobLocker implements LockInterface
         //content does not matter
         $info->set(null);
 
-        $info->expiresAt($time->modify('+30 minutes'));
+        $info->expiresAfter($job->getSchedule()->getTtl());
 
         // and saves it
         return $this->cache->save($info);

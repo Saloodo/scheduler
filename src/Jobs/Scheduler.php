@@ -14,16 +14,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Scheduler
 {
-    /** @var EventDispatcher */
     private $dispatcher;
-
-    /** @var SchedulerLocker */
     private $schedulerLocker;
-
-    /** @var JobLocker */
     private $jobLocker;
-
-    /** @var JobInterface[] */
     private $jobs = [];
 
     public function __construct(EventDispatcherInterface $dispatcher = null, SchedulerLocker $schedulerLocker, JobLocker $jobLocker)

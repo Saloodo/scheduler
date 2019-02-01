@@ -8,13 +8,10 @@ use Cron\FieldFactory;
 
 class Schedule
 {
-    /**
-     * @var CronExpression
-     */
     private $cron;
-
-    protected $shouldRunOnOnlyOneServer = true;
-    protected $canOverlap = false;
+    private $shouldRunOnOnlyOneServer = true;
+    private $canOverlap = false;
+    private $ttl = 60*30; // 30 minutes
 
     /**
      * Schedule constructor.
@@ -78,10 +75,6 @@ class Schedule
         return $this->spliceIntoPosition($hours, 1);
     }
 
-    /**
-     *
-     * @return Schedule
-     */
     public function everyFiveMinutes(): self
     {
         return $this->everyMinutes(5);
@@ -200,6 +193,22 @@ class Schedule
     {
         $this->canOverlap = $decision;
         return $this;
+    }
+
+    /**
+     * Sets the ttl to control job overlapping
+     * @param int $ttl
+     * @return $this
+     */
+    public function setTtl(int $ttl)
+    {
+        $this->ttl = $ttl;
+        return $this;
+    }
+
+    public function getTtl(): int
+    {
+        return $this->ttl;
     }
     
     public function checkShouldRunOnOnlyOneInstance(): bool
