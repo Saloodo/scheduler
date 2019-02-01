@@ -75,6 +75,11 @@ class Schedule
         return $this->spliceIntoPosition($hours, 1);
     }
 
+    public function everyMinute(): self
+    {
+        return $this->everyMinutes(1);
+    }
+
     public function everyFiveMinutes(): self
     {
         return $this->everyMinutes(5);
