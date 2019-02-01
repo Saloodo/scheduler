@@ -5,41 +5,36 @@
 [![Build Status][ico-travis]][link-travis]
 
 Saloodo Scheduler is a powerful job scheduler based on Laravel Scheduler.
+It runs jobs asynchronously using a different php process for each job.
 
 
 ## Instalation
+
+### Require the package
 
 ``` bash
 composer require saloodo/scheduler
 ```
 
-Add the Bundle to AppKernel
+### Add the Bundle to AppKernel
 
 ```
  new Saloodo\Scheduler\SchedulerBundle(),
 ```
 
-
-Define the cache configuration (used to avoid overlapping/run on just one instance):
+### Define the cache configuration
 
 ```yaml
 scheduler:
   cache_driver: 'app_general_cache'
 ```
 
-Define the services, and tag them as `scheduler.job`
+## How do I add jobs to the scheduler?
 
-```yaml
- AppBundle\Jobs\JobEvery5Minute:
-        arguments:
-        tags:
-            - { name: scheduler.job}
-```
-
-Create a Job class
+### Create a Job class
 
 >```php
->//AppBundle/Jobs/JobEvery5Minutes.php
+>//AppBundle/Jobs/ExpireShipments.php
 ><?php
 >
 >namespace AppBundle\Jobs;
@@ -47,23 +42,44 @@ Create a Job class
 >use Saloodo\Scheduler\Jobs\AbstractJob;
 >use Saloodo\Scheduler\Jobs\Schedule;
 >
->class JobEvery5Minutes extends AbstractJob
+>class ExpireShipments extends AbstractJob
 >{
+>    private $repository;
+>   
+>    public function __construct(ShipmentRepository $repository)
+>    {
+>       $this->repository = $repository;
+>    }
+>     
 >    protected function initialize(Schedule $schedule)
 >    {
+>        //sets the execution of this job to every 5 minutes
 >        $schedule
 >            ->everyFiveMinutes();
 >    }
 >
 >    public function run()
 >    {
->        //
+>        $this->repository->expireShipments();
 >    }
 >}
 >```
 
+### Add your created job to services
 
-Listen to the events
+
+```yaml
+ AppBundle\Jobs\ExpireShipments:
+        arguments:
+            - '@App/Repository/ShipmentRepository'
+        #Tag them as scheduler.job
+        tags:
+            - { name: scheduler.job}
+```
+
+
+
+### Listen to the events
 
 Saloodo Scheduler dispatches events out of the box. You can listen or subscribe to these events.
 
@@ -72,13 +88,86 @@ job.scheduler.started
 job.scheduler.completed
 job.started
 job.completed
+job.failed
+job.skipped
 ```
 
 ## Starting the scheduler
 You only need to add the following Cron entry to your server.
 
+```bash
+* * * * * php /path-to-your-project/bin/console jobs:run >> /dev/null 2>&1
+
 ```
-* * * * * php /path-to-your-project/bin/console scheduler:run >> /dev/null 2>&1
+
+## Options
+
+### Run on just one server
+```php
+$scheduler->shouldRunOnOnlyOneInstance();
+
+```
+
+By default, jobs will be executed on only one instance. It means that if more than one instance triggers the scheduler execution at the same minute, jobs it will skipped. To overwrite this setting and allow multiple execution of the same job on the same minute, use `$scheduler->shouldRunOnOnlyOneInstance(false);` 
+
+### Job overlapping
+```php
+$scheduler->canOverlap(false);
+
+```
+
+By default, jobs cannot be overlapped. Before starts, a job check if it's already running. If jobs can overlap, overwrite this setting by using `$scheduler->canOverlap(true);`.
+
+
+### Job frequency
+
+```php
+$scheduler->everyFiveMinutes(); // runs job every 5 minutes
+
+$scheduler->everyTenMinutes(); // runs job every 10 minutes
+
+$scheduler->everyFifteenMinutes(); // runs job every 15 minutes
+
+$scheduler->everyMinutes(23); // runs job every 23 minutes
+
+$scheduler->daily()->atHour(17)->atMinute(30); // runs job every day at 17:30
+
+$scheduler->hourly(); // runs job every hour
+
+$scheduler->daily(); // runs job every day at 00:00
+
+$scheduler->daily()->atHour(17)->atMinute(30); // runs job every day at 17:30
+
+$scheduler->monthly()->atDay(3);  // runs job month, at the 3rd at 00:00
+
+$scheduler->monthly()->atDay(3)->atHour(17)->atMinute(30); // runs job month, at the 3rd at 17:30
+
+```
+
+### Using all together
+```php
+$scheduler->canOverlap(true)->shouldRunOnOnlyOneInstance(false)->everyFiveMinutes();
+
+```
+
+
+
+## Commands
+
+You can manually trigger jobs execution by simply executing `bin/console jobs:run` from you application root. You can also run a single job, appending the id of the job to the command. `bin/console jobs:run da6f3a6948`.
+
+To get an overview of the defined jobs, run `bin/console jobs:list`.
+
+ ```
+ +------------+-----------------------------------------------------+--------------+-------------+--------------------------+
+ | ID         | Class                                               | Expression   | Can overlap | Run only on one instance |
+ +------------+-----------------------------------------------------+--------------+-------------+--------------------------+
+ | da6f3a6948 | AppBundle\Jobs\JobEvery1Minute                      | * * * * *    | no          | yes                      |
+ | 26e25dbd48 | AppBundle\Jobs\JobEvery1MinuteThatOverlaps          | * * * * *    | yes         | yes                      |
+ | f9dfbec59a | AppBundle\Jobs\JobEvery5Minutes                     | */5 * * * *  | no          | yes                      |
+ | d2f87097db | AppBundle\Jobs\JobEvery10MinutesRunningInAllServers | */10 * * * * | no          | no                       |
+ +------------+-----------------------------------------------------+--------------+-------------+--------------------------+
+
 ```
 ## License
 
