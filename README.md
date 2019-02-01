@@ -116,7 +116,13 @@ $scheduler->canOverlap(false);
 
 ```
 
-By default, jobs cannot be overlapped. Before starts, a job check if it's already running. If jobs can overlap, overwrite this setting by using `$scheduler->canOverlap(true);`.
+By default, jobs cannot be overlapped. Before it starts, a job check if it's already running. If jobs can overlap, overwrite this setting by using `$scheduler->canOverlap(true);`.
+
+
+NOTE: When canOverlap is set to false, you can also set a ttl for the job locker. `->setTttl(60) //number in seconds`.
+This is particularly important to avoid locking a task for unnecessary periods of time on a unexpected system shutdown that could wrongly keep the task locked.
+
+this is the  MAX time that the lock would be held. In normal conditions, after the job execution the lock is automatically released.
 
 
 ### Job frequency
