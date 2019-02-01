@@ -11,6 +11,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ListCommand extends ContainerAwareCommand
 {
+    /**
+     * @inheritdoc
+     */
     protected function configure()
     {
         $this
@@ -19,6 +22,9 @@ class ListCommand extends ContainerAwareCommand
             ->setHelp("This command display the list of registered jobs.");
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $scheduler = $this->getContainer()->get(Scheduler::class);

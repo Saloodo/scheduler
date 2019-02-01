@@ -2,14 +2,11 @@
 
 namespace Saloodo\Scheduler\Jobs\Mutex;
 
-use DateTimeImmutable;
 use Saloodo\Scheduler\Contract\JobInterface;
 use Saloodo\Scheduler\Contract\LockInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 
-/**
- *
- */
+
 class JobLocker implements LockInterface
 {
     protected $cache;
@@ -19,6 +16,9 @@ class JobLocker implements LockInterface
         $this->cache = $cache;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function tryLock(JobInterface $job): bool
     {
         $info = $this->cache->getItem($job->getUniqueId());
@@ -37,6 +37,9 @@ class JobLocker implements LockInterface
         return $this->cache->save($info);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function unlock(JobInterface $job): bool
     {
         return $this->cache->deleteItem($job->getUniqueId());

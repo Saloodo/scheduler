@@ -23,6 +23,9 @@ class RunCommand extends ContainerAwareCommand
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    /**
+     * @inheritdoc
+     */
     protected function configure()
     {
         $this
@@ -31,6 +34,9 @@ class RunCommand extends ContainerAwareCommand
             ->addArgument("id", InputArgument::OPTIONAL, "The ID of the task.");
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $this->scheduler = $scheduler = $this->getContainer()->get(Scheduler::class);
