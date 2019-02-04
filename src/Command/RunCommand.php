@@ -23,6 +23,9 @@ class RunCommand extends ContainerAwareCommand
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    /** @var string */
+    private $environment;
+
     /**
      * @inheritdoc
      */
@@ -41,6 +44,7 @@ class RunCommand extends ContainerAwareCommand
     {
         $this->scheduler = $scheduler = $this->getContainer()->get(Scheduler::class);
         $this->eventDispatcher = $scheduler = $this->getContainer()->get('event_dispatcher');
+        $this->environment = $this->getContainer()->getParameter('kernel.environment');
         parent::initialize($input, $output);
     }
 
@@ -76,7 +80,14 @@ class RunCommand extends ContainerAwareCommand
 
             echo get_class($job) . PHP_EOL;
 
-            $process = new Process($phpBinaryPath . ' ' . $symfonyPath . '/bin/console jobs:run ' . $job->getUniqueId());
+            $process = new Process(
+                sprintf(
+                    '%s %s/bin/console jobs:run %s --env=%s',
+                    $phpBinaryPath,
+                    $symfonyPath,
+                    $job->getUniqueId(),
+                    $this->environment)
+            );
 
             $process->setTimeout(null);
 
