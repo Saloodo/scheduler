@@ -183,7 +183,7 @@ This package is open-sourced software licensed under the MIT license.
 
 [ico-version]: https://img.shields.io/packagist/v/saloodo/scheduler.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/saloodo/scheduler.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/saloodo/scheduler/master.svg?style=flat-square
+[ico-travis]: https://api.travis-ci.com/Saloodo/scheduler.svg?branch=master
 
 
 [link-packagist]: https://packagist.org/packages/saloodo/scheduler
