@@ -62,7 +62,7 @@ class RunCommand extends ContainerAwareCommand
 
     /**
      * Run all jobs
-     * @param callable|null $callable A callback to receive all proccess when they are finished
+     * @param callable|null $callable A callback to receive all process when they are finished
      */
     protected function runJobs(Callable $callable = null)
     {
@@ -110,22 +110,30 @@ class RunCommand extends ContainerAwareCommand
     }
 
     /**
-     * Executes a single Job
+     * Executes a single Job by a single id or job name
      * @param string $id
+     * @return bool
      */
-    protected function runSingleJob(string $id)
+    protected function runSingleJob(string $id): bool
     {
         /** @var JobInterface $job */
-        foreach ($this->scheduler->getDueJobs("now") as $job) {
-            if ($job->getUniqueId() == $id) {
+        $jobs = array_filter($this->scheduler->getDueJobs("now"), function (JobInterface $item) use ($id) {
+            return $item->getUniqueId() === $id || $item->getName() === $id;
+        });
 
-                if ($job->getSchedule()->checkShouldRunOnOnlyOneInstance()) {
-                    $this->scheduler->runSingleServerJob($job);
-                } else {
-                    $this->scheduler->runJob($job);
-                }
-            }
+        $job = reset($jobs);
+
+        if ($job === false) {
+            return false;
         }
+
+        if ($job->getSchedule()->checkShouldRunOnOnlyOneInstance()) {
+            $this->scheduler->runSingleServerJob($job);
+            return true;
+        }
+
+        $this->scheduler->runJob($job);
+        return true;
     }
 
     /**
