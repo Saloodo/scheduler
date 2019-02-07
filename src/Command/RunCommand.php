@@ -9,6 +9,7 @@ use Saloodo\Scheduler\Jobs\Scheduler;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -34,7 +35,8 @@ class RunCommand extends ContainerAwareCommand
         $this
             ->setName("jobs:run")
             ->setDescription("Run due jobs")
-            ->addArgument("id", InputArgument::OPTIONAL, "The ID of the task.");
+            ->addArgument("id", InputArgument::OPTIONAL, "The ID of the task.")
+            ->addOption('force', null, InputOption::VALUE_OPTIONAL, 'Whether execution of single job should be forced', false);
     }
 
     /**
@@ -53,7 +55,7 @@ class RunCommand extends ContainerAwareCommand
         $id = $input->getArgument("id");
 
         if ($id) {
-            $this->runSingleJob($id);
+            $this->runSingleJob($id, $input->getOption('force') !== false);
             return;
         }
 
@@ -112,9 +114,10 @@ class RunCommand extends ContainerAwareCommand
     /**
      * Executes a single Job by a single id or job name
      * @param string $id
+     * @param bool $force
      * @return bool
      */
-    protected function runSingleJob(string $id): bool
+    protected function runSingleJob(string $id, bool $force): bool
     {
         /** @var JobInterface $job */
         $jobs = array_filter($this->scheduler->getDueJobs("now"), function (JobInterface $item) use ($id) {
@@ -127,12 +130,13 @@ class RunCommand extends ContainerAwareCommand
             return false;
         }
 
-        if ($job->getSchedule()->checkShouldRunOnOnlyOneInstance()) {
-            $this->scheduler->runSingleServerJob($job);
+        if ($force || $job->getSchedule()->checkShouldRunOnOnlyOneInstance() === false) {
+            $this->scheduler->runJob($job);
             return true;
         }
 
-        $this->scheduler->runJob($job);
+        // runs job on single server
+        $this->scheduler->runSingleServerJob($job);
         return true;
     }
 
