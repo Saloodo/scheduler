@@ -120,7 +120,7 @@ class RunCommand extends ContainerAwareCommand
     protected function runSingleJob(string $id, bool $force): bool
     {
         /** @var JobInterface $job */
-        $jobs = array_filter($this->scheduler->getDueJobs("now"), function (JobInterface $item) use ($id) {
+        $jobs = array_filter($this->scheduler->getJobs(), function (JobInterface $item) use ($id) {
             return $item->getUniqueId() === $id || $item->getName() === $id;
         });
 
