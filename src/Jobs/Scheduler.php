@@ -35,54 +35,10 @@ class Scheduler
     }
 
     /**
-     * Run the job if the specific instance should run
-     * @param JobInterface $job
-     */
-    public function runSingleServerJob(JobInterface $job)
-    {
-        if ($this->serverShouldRun($job)) {
-
-            $this->runJob($job);
-            return;
-        }
-
-        $this->dispatcher->dispatch(JobSkippedEvent::NAME, new JobSkippedEvent($job, JobSkippedEvent::SERVER_SHOULD_NOT_RUN));
-    }
-
-    /**
-     * Call to run job, before checking for overlapping and server run
-     * @param JobInterface $job
-     */
-    public function runJob(JobInterface $job)
-    {
-        if ($job->getSchedule()->checkCanOverlap()) {
-            $this->finallyRun($job);
-            return;
-        }
-
-        $this->runWithoutOverlapping($job);
-    }
-
-    /**
-     * Run the job if task would not overlap
-     * @param JobInterface $job
-     */
-    protected function runWithoutOverlapping(JobInterface $job)
-    {
-        if ($this->wouldOverlap($job)) {
-            $this->dispatcher->dispatch(JobSkippedEvent::NAME, new JobSkippedEvent($job, JobSkippedEvent::WOULD_OVERLAP));
-            
-            return;
-        }
-
-        $this->finallyRun($job);
-    }
-
-    /**
      * Finally tun the jobs
      * @param JobInterface $job
      */
-    protected function finallyRun(JobInterface $job)
+    public function run(JobInterface $job)
     {
         $this->dispatcher->dispatch(JobStartedEvent::NAME, new JobStartedEvent($job));
 
@@ -103,7 +59,7 @@ class Scheduler
      * @param JobInterface $job
      * @return bool
      */
-    protected function wouldOverlap(JobInterface $job): bool
+    public function wouldOverlap(JobInterface $job): bool
     {
         //if cannot lock, it means that the key exists already, and it would overlap
         return !$this->jobLocker->tryLock($job);
@@ -114,7 +70,7 @@ class Scheduler
      * @param JobInterface $job
      * @return bool
      */
-    protected function serverShouldRun(JobInterface $job): bool
+    public function serverShouldRun(JobInterface $job): bool
     {
         return $this->schedulerLocker->tryLock($job);
     }
