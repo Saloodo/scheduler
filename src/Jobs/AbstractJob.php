@@ -8,6 +8,12 @@ abstract class AbstractJob implements JobInterface
 {
     private $schedule;
 
+    /** @var int */
+    private $startTime;
+
+    /** @var int */
+    private $endTime;
+
     public function __construct()
     {
         $this->schedule = new Schedule();
@@ -45,6 +51,42 @@ abstract class AbstractJob implements JobInterface
     public function getName(): string
     {
         return get_called_class();
+    }
+
+    /**
+     * @return int
+     */
+    public function getStartTime(): int
+    {
+        return $this->startTime;
+    }
+
+    /**
+     * @param int $startTime
+     * @return AbstractJob
+     */
+    public function setStartTime(int $startTime): AbstractJob
+    {
+        $this->startTime = $startTime;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEndTime(): int
+    {
+        return $this->endTime;
+    }
+
+    /**
+     * @param int $endTime
+     * @return AbstractJob
+     */
+    public function setEndTime(int $endTime): AbstractJob
+    {
+        $this->endTime = $endTime;
+        return $this;
     }
 
     /**

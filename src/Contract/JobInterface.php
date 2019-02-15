@@ -32,4 +32,28 @@ interface JobInterface
      * @return Schedule
      */
     public function getSchedule(): Schedule;
+
+    /**
+     * @return int
+     */
+    public function getStartTime(): int;
+
+    /**
+     * @param int $startTime
+     * @return self
+     */
+    public function setStartTime(int $startTime): self;
+
+
+    /**
+     * @return int
+     */
+    public function getEndTime(): int;
+
+
+    /**
+     * @param int $endTime
+     * @return self
+     */
+    public function setEndTime(int $endTime): self;
 }

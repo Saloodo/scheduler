@@ -40,6 +40,7 @@ class Scheduler
      */
     public function run(JobInterface $job)
     {
+        $job->setStartTime(microtime(true));
         $this->dispatcher->dispatch(JobStartedEvent::NAME, new JobStartedEvent($job));
 
         try {
@@ -51,6 +52,7 @@ class Scheduler
             $this->jobLocker->unlock($job);
         }
 
+        $job->setEndTime(microtime(true));
         $this->dispatcher->dispatch(JobCompletedEvent::NAME, new JobCompletedEvent($job));
     }
 
