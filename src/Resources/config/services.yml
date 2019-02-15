@@ -20,4 +20,7 @@ services:
     tags: ['console.command']
 
   Saloodo\Scheduler\Command\RunCommand:
+      arguments:
+        - '@Saloodo\Scheduler\Jobs\Scheduler'
+        - '@event_dispatcher'
       tags: ['console.command']

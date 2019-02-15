@@ -158,17 +158,15 @@ $scheduler->canOverlap(true)->shouldRunOnOnlyOneInstance(false)->everyFiveMinute
 
 ```
 
-
-
 ## Commands
 
 ### Running a single job
-You can manually trigger a single job execution by simply executing `bin/console jobs:run {id}` or  `bin/console jobs:run {fullQualifiedClassName}` from you application root.
+You can manually trigger a single job execution by simply executing `bin/console jobs:run {id}` or  `bin/console jobs:run {fullyQualifiedClassName}` from you application root.
 
-Optionally, you can pass a `--force` argument. This will skip the check for running on a single server.
+Single jobs will always be executed, as the check for overlapping and running on single server are done by the "run multiple jobs command")
 
 ### Running all jobs
-To mannually trigger all jobs, simply run `bin/console jobs:run`
+To mannually trigger all jobs, simply run `bin/console jobs:run`. To force execution of all due jobs (without checking for overlap or running on single server), optionally, pass a `--force` argument. This will skip the check for running on a single server.
 
 ### Listing jobs
 

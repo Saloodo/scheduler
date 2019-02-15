@@ -3,6 +3,7 @@
 namespace Saloodo\Scheduler\Command;
 
 use Saloodo\Scheduler\Contract\JobInterface;
+use Saloodo\Scheduler\Event\JobSkippedEvent;
 use Saloodo\Scheduler\Event\SchedulerCompletedEvent;
 use Saloodo\Scheduler\Event\SchedulerStartedEvent;
 use Saloodo\Scheduler\Jobs\Scheduler;
@@ -30,13 +31,24 @@ class RunCommand extends ContainerAwareCommand
     /**
      * @inheritdoc
      */
+    public function __construct(Scheduler $scheduler, EventDispatcherInterface $eventDispatcher, ?string $name = null)
+    {
+        $this->scheduler = $scheduler;
+        $this->eventDispatcher = $eventDispatcher;
+
+        parent::__construct($name);
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function configure()
     {
         $this
             ->setName("jobs:run")
             ->setDescription("Run due jobs")
             ->addArgument("id", InputArgument::OPTIONAL, "The ID of the task.")
-            ->addOption('force', null, InputOption::VALUE_OPTIONAL, 'Whether execution of single job should be forced', false);
+            ->addOption('force', null, InputOption::VALUE_OPTIONAL, 'Whether execution of all jobs should be forced', false);
     }
 
     /**
@@ -44,8 +56,6 @@ class RunCommand extends ContainerAwareCommand
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        $this->scheduler = $scheduler = $this->getContainer()->get(Scheduler::class);
-        $this->eventDispatcher = $scheduler = $this->getContainer()->get('event_dispatcher');
         $this->environment = $this->getContainer()->getParameter('kernel.environment');
         parent::initialize($input, $output);
     }
@@ -55,69 +65,96 @@ class RunCommand extends ContainerAwareCommand
         $id = $input->getArgument("id");
 
         if ($id) {
-            $this->runSingleJob($id, $input->getOption('force') !== false);
+            $this->runSingleJob($id);
             return;
         }
 
-        $this->runJobs();
+        $this->runJobs($input->getOption('force') !== false);
+
+        $memoryUsage = memory_get_usage(true) / 1024 / 1024;
+        $output->writeln("Scheduler finished with memory: ${memoryUsage}M");
     }
 
     /**
      * Run all jobs
+     * @param bool $force Whether all jobs execution should be forced
      * @param callable|null $callable A callback to receive all process when they are finished
      */
-    protected function runJobs(Callable $callable = null)
+    protected function runJobs(bool $force, Callable $callable = null)
     {
         $this->eventDispatcher->dispatch(SchedulerStartedEvent::NAME, new SchedulerStartedEvent());
-
-        $phpBinaryFinder = new PhpExecutableFinder();
-        $phpBinaryPath = $phpBinaryFinder->find();
-
-        $symfonyPath = $this->getApplication()->getKernel()->getProjectDir();
 
         $allProcesses = [];
 
         /** @var JobInterface $job */
         foreach ($this->scheduler->getDueJobs("now") as $job) {
-
-            echo get_class($job) . PHP_EOL;
-
-            $process = new Process(
-                sprintf(
-                    '%s %s/bin/console jobs:run %s --env=%s',
-                    $phpBinaryPath,
-                    $symfonyPath,
-                    $job->getUniqueId(),
-                    $this->environment)
-            );
-
-            $process->setTimeout(null);
-
-            $process->start(function ($a, $b) {
-                echo $b;
-            });
-
-            $allProcesses[] = $process;
+            if ($this->shouldRun($job) || $force) {
+                $allProcesses[] = $this->createProcess($job);
+            }
         }
 
         $this->waitForProcesses($allProcesses);
 
         $this->eventDispatcher->dispatch(SchedulerCompletedEvent::NAME, new SchedulerCompletedEvent());
 
-        $return = $allProcesses;
-
         if (is_callable($callable)) {
-            call_user_func($callable, $return);
+            call_user_func($callable, $allProcesses);
         }
+    }
+
+    private function shouldRun(JobInterface $job): bool
+    {
+        if ($job->getSchedule()->checkShouldRunOnOnlyOneInstance()) {
+            if ($this->scheduler->serverShouldRun($job)) {
+                return true;
+            }
+
+            $this->eventDispatcher->dispatch(JobSkippedEvent::NAME, new JobSkippedEvent($job, JobSkippedEvent::SERVER_SHOULD_NOT_RUN));
+            return false;
+        }
+
+        if ($job->getSchedule()->canOverlap()) {
+            return true;
+        }
+
+        if ($this->scheduler->wouldOverlap($job)) {
+            $this->eventDispatcher->dispatch(JobSkippedEvent::NAME, new JobSkippedEvent($job, JobSkippedEvent::WOULD_OVERLAP));
+            return false;
+        }
+
+        return true;
+    }
+
+    private function createProcess(JobInterface $job): Process
+    {
+        $phpBinaryFinder = new PhpExecutableFinder();
+        $phpBinaryPath = $phpBinaryFinder->find();
+        $symfonyPath = $this->getApplication()->getKernel()->getProjectDir();
+
+        $process = new Process(
+            sprintf(
+                '%s %s/bin/console jobs:run %s --env=%s',
+                $phpBinaryPath,
+                $symfonyPath,
+                $job->getUniqueId(),
+                $this->environment)
+        );
+
+        $process->setTimeout(null);
+
+        $process->start(function ($a, $b){
+            echo $b;
+        });
+
+        return $process;
     }
 
     /**
      * Executes a single Job by a single id or job name
      * @param string $id
-     * @param bool $force
      * @return bool
      */
-    protected function runSingleJob(string $id, bool $force): bool
+    protected function runSingleJob(string $id): bool
     {
         /** @var JobInterface $job */
         $jobs = array_filter($this->scheduler->getJobs(), function (JobInterface $item) use ($id) {
@@ -130,13 +167,9 @@ class RunCommand extends ContainerAwareCommand
             return false;
         }
 
-        if ($force || $job->getSchedule()->checkShouldRunOnOnlyOneInstance() === false) {
-            $this->scheduler->runJob($job);
-            return true;
-        }
-
         // runs job on single server
-        $this->scheduler->runSingleServerJob($job);
+        $this->scheduler->run($job);
+
         return true;
     }
 
