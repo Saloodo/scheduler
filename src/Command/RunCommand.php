@@ -105,21 +105,17 @@ class RunCommand extends ContainerAwareCommand
     private function shouldRun(JobInterface $job): bool
     {
         if ($job->getSchedule()->checkShouldRunOnOnlyOneInstance()) {
-            if ($this->scheduler->serverShouldRun($job)) {
-                return true;
+            if (!$this->scheduler->serverShouldRun($job)) {
+                $this->eventDispatcher->dispatch(JobSkippedEvent::NAME, new JobSkippedEvent($job, JobSkippedEvent::SERVER_SHOULD_NOT_RUN));
+                return false;
             }
-
-            $this->eventDispatcher->dispatch(JobSkippedEvent::NAME, new JobSkippedEvent($job, JobSkippedEvent::SERVER_SHOULD_NOT_RUN));
-            return false;
         }
 
-        if ($job->getSchedule()->canOverlap()) {
-            return true;
-        }
-
-        if ($this->scheduler->wouldOverlap($job)) {
-            $this->eventDispatcher->dispatch(JobSkippedEvent::NAME, new JobSkippedEvent($job, JobSkippedEvent::WOULD_OVERLAP));
-            return false;
+        if (!$job->getSchedule()->canOverlap()) {
+            if ($this->scheduler->wouldOverlap($job)) {
+                $this->eventDispatcher->dispatch(JobSkippedEvent::NAME, new JobSkippedEvent($job, JobSkippedEvent::WOULD_OVERLAP));
+                return false;
+            }
         }
 
         return true;
@@ -142,7 +138,7 @@ class RunCommand extends ContainerAwareCommand
 
         $process->setTimeout(null);
 
-        $process->start(function ($a, $b){
+        $process->start(function ($a, $b) {
             echo $b;
         });
 
