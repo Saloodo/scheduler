@@ -111,7 +111,7 @@ class RunCommand extends ContainerAwareCommand
             }
         }
 
-        if (!$job->getSchedule()->canOverlap()) {
+        if (!$job->getSchedule()->checkCanOverlap()) {
             if ($this->scheduler->wouldOverlap($job)) {
                 $this->eventDispatcher->dispatch(JobSkippedEvent::NAME, new JobSkippedEvent($job, JobSkippedEvent::WOULD_OVERLAP));
                 return false;
