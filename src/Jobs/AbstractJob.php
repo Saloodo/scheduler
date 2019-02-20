@@ -63,9 +63,9 @@ abstract class AbstractJob implements JobInterface
 
     /**
      * @param int $startTime
-     * @return AbstractJob
+     * @return JobInterface
      */
-    public function setStartTime(int $startTime): AbstractJob
+    public function setStartTime(int $startTime): JobInterface
     {
         $this->startTime = $startTime;
         return $this;
@@ -81,9 +81,9 @@ abstract class AbstractJob implements JobInterface
 
     /**
      * @param int $endTime
-     * @return AbstractJob
+     * @return JobInterface
      */
-    public function setEndTime(int $endTime): AbstractJob
+    public function setEndTime(int $endTime): JobInterface
     {
         $this->endTime = $endTime;
         return $this;
