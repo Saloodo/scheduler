@@ -1,6 +1,3 @@
-dist: trusty
-group: edge
-
 sudo: true
 
 language: bash
