@@ -168,6 +168,12 @@ class Schedule
         return $this->cron->getExpression();
     }
 
+    public function setExpression(string $expression = "* * * * *"): self
+    {
+        $this->cron->setExpression($expression);
+        return $this;
+    }
+
     /**
      * Return true if the schedule is due to now
      * @param $currentTime

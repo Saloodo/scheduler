@@ -98,4 +98,15 @@ class FrequencyTest extends TestCase
 
         $this->assertEquals("0 16 10 * *", $schedule->getExpression());
     }
+
+    public function testSetExpresion()
+    {
+        $schedule = new Schedule();
+
+        $this->assertEquals("* * * * *", $schedule->getExpression());
+
+        $schedule->setExpression("* 11,17 * * *");
+
+        $this->assertEquals("* 11,17 * * *", $schedule->getExpression());
+    }
 }
