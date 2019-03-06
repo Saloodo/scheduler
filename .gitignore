@@ -1,0 +1,11 @@
+.DS_Store
+
+# IDE files
+/.idea
+/.buildpath
+/.project
+/.settings
+
+# Managed by Composer
+/var/bootstrap.php.cache
+/vendor/
