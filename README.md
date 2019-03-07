@@ -150,6 +150,7 @@ $scheduler->monthly()->atDay(3);  // runs job month, at the 3rd at 00:00
 
 $scheduler->monthly()->atDay(3)->atHour(17)->atMinute(30); // runs job month, at the 3rd at 17:30
 
+$scheduler->setExpression("* 11,17 * * *"); // sets raw  expression, runs job every day at 11:00 and 17:00
 ```
 
 ### Using all together
