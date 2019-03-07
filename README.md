@@ -4,7 +4,7 @@
 [![Total Downloads][ico-downloads]][link-downloads]
 [![Build Status][ico-travis]][link-travis]
 
-Saloodo Scheduler is a powerful job scheduler based on Laravel Scheduler.
+Saloodo Scheduler is a powerful job scheduler inspired on Laravel Scheduler.
 It runs jobs asynchronously using a different php process for each job.
 
 
