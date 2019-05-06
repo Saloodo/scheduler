@@ -136,6 +136,16 @@ class Schedule
     }
 
     /**
+     * Sets the cron to work just on week days
+     * @return $this
+     */
+    public function onlyWeekDays(): self
+    {
+        $this->cron->setPart(4, "1-5");
+        return $this;
+    }
+
+    /**
      * @param int $value
      * @param int $position
      * @return $this
@@ -177,22 +187,23 @@ class Schedule
     /**
      * Return true if the schedule is due to now
      * @param $currentTime
+     * @param string $timeZone
      * @return bool
      */
-    public function isDue($currentTime = 'now'): bool
+    public function isDue($currentTime = 'now', string $timeZone = "Europe/Berlin"): bool
     {
-        return $this->cron->isDue($currentTime);
+        return $this->cron->isDue($currentTime, $timeZone);
     }
 
     /**
-     * Sets whether the job should run on just one instance
-     * @param bool $decision
-     * @return $this
+     * Return the next run date
+     * @param $currentTime
+     * @param string $timeZone
+     * @return \DateTime
      */
-    public function shouldRunOnOnlyOneInstance(bool $decision = true): self
+    public function getNextRunDate($currentTime = 'now', string $timeZone = "Europe/Berlin"): \DateTime
     {
-        $this->shouldRunOnOnlyOneServer = $decision;
-        return $this;
+        return $this->cron->getNextRunDate($currentTime, 0, false, $timeZone);
     }
 
     /**
