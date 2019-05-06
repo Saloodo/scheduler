@@ -11,13 +11,13 @@ class Schedule
     private $cron;
     private $shouldRunOnOnlyOneServer = true;
     private $canOverlap = false;
-    private $ttl = 60*30; // 30 minutes
+    private $ttl = 60 * 30; // 30 minutes
 
     /**
      * Schedule constructor.
      * @param string $expression the default cron
      */
-    public function __construct(string $expression = "* * * * *")
+    public function __construct(string $expression = '* * * * *')
     {
         $this->cron = new CronExpression($expression, new FieldFactory());
     }
@@ -29,7 +29,7 @@ class Schedule
      */
     public function atDay(int $day): self
     {
-        $this->cron->setPart(2, $day);
+        $this->cron->setPart(2, (string)$day);
         return $this;
     }
 
@@ -40,7 +40,7 @@ class Schedule
      */
     public function atHour(int $hour): self
     {
-        $this->cron->setPart(1, $hour);
+        $this->cron->setPart(1, (string)$hour);
         return $this;
     }
 
@@ -51,7 +51,7 @@ class Schedule
      */
     public function atMinute(int $minutes): self
     {
-        $this->cron->setPart(0, $minutes);
+        $this->cron->setPart(0, (string)$minutes);
         return $this;
     }
 
@@ -106,7 +106,7 @@ class Schedule
      */
     public function hourly(): self
     {
-        $this->cron->setPart(0, 0);
+        $this->cron->setPart(0, '0');
         return $this;
     }
 
@@ -116,9 +116,9 @@ class Schedule
      */
     public function daily(): self
     {
-        $this->cron->setPart(2, "*");
-        $this->cron->setPart(1, 0);
-        $this->cron->setPart(0, 0);
+        $this->cron->setPart(2, '*');
+        $this->cron->setPart(1, '0');
+        $this->cron->setPart(0, '0');
         return $this;
     }
 
@@ -128,10 +128,10 @@ class Schedule
      */
     public function monthly(): self
     {
-        $this->cron->setPart(3, "*");
-        $this->cron->setPart(2, 1);
-        $this->cron->setPart(1, 0);
-        $this->cron->setPart(0, 0);
+        $this->cron->setPart(3, '*');
+        $this->cron->setPart(2, '1');
+        $this->cron->setPart(1, '0');
+        $this->cron->setPart(0, '0');
         return $this;
     }
 
@@ -141,7 +141,7 @@ class Schedule
      */
     public function onlyWeekDays(): self
     {
-        $this->cron->setPart(4, "1-5");
+        $this->cron->setPart(4, '1-5');
         return $this;
     }
 
@@ -153,9 +153,9 @@ class Schedule
     public function spliceIntoPosition($value, int $position): self
     {
         if ($value === 1) {
-            $expr = "*";
+            $expr = '*';
         } else {
-            $expr = "*/" . intval($value);
+            $expr = '*/' . intval($value);
         }
 
         $this->cron->setPart($position, $expr);
@@ -178,7 +178,7 @@ class Schedule
         return $this->cron->getExpression();
     }
 
-    public function setExpression(string $expression = "* * * * *"): self
+    public function setExpression(string $expression = '* * * * *'): self
     {
         $this->cron->setExpression($expression);
         return $this;
@@ -190,7 +190,7 @@ class Schedule
      * @param string $timeZone
      * @return bool
      */
-    public function isDue($currentTime = 'now', string $timeZone = "Europe/Berlin"): bool
+    public function isDue($currentTime = 'now', string $timeZone = 'Europe/Berlin'): bool
     {
         return $this->cron->isDue($currentTime, $timeZone);
     }
@@ -201,7 +201,7 @@ class Schedule
      * @param string $timeZone
      * @return \DateTime
      */
-    public function getNextRunDate($currentTime = 'now', string $timeZone = "Europe/Berlin"): \DateTime
+    public function getNextRunDate($currentTime = 'now', string $timeZone = 'Europe/Berlin'): \DateTime
     {
         return $this->cron->getNextRunDate($currentTime, 0, false, $timeZone);
     }
