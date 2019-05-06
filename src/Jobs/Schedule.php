@@ -196,6 +196,18 @@ class Schedule
     }
 
     /**
+     * Sets whether the job should run on just one instance
+     * @param bool $decision
+     * @return $this
+     * @return \DateTime
+     */
+    public function shouldRunOnOnlyOneInstance(bool $decision = true): self
+    {
+        $this->shouldRunOnOnlyOneServer = $decision;
+        return $this;
+    }
+
+    /**
      * Return the next run date
      * @param $currentTime
      * @param string $timeZone

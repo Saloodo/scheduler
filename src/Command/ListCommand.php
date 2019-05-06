@@ -33,6 +33,7 @@ class ListCommand extends ContainerAwareCommand
             "ID",
             "Class",
             "Expression",
+            "Next Execution",
             "Can overlap",
             "Run only on one instance",
         ]);
@@ -44,6 +45,7 @@ class ListCommand extends ContainerAwareCommand
                 $job->getUniqueId(),
                 get_class($job),
                 $job->getSchedule()->getExpression(),
+                $job->getSchedule()->getNextRunDate()->format('d-m-y H:i:s'),
                 $job->getSchedule()->checkCanOverlap() ? 'yes' : 'no',
                 $job->getSchedule()->checkShouldRunOnOnlyOneInstance() ? 'yes' : 'no',
             ]);
