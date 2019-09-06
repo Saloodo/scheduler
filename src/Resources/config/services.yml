@@ -23,8 +23,8 @@ services:
     public: true
     arguments:
       - '@event_dispatcher'
-      - '@Saloodo\Scheduler\Contract\LockInterface'
-      - '@Saloodo\Scheduler\Contract\LockInterface'
+      - '@Saloodo\Scheduler\Jobs\Mutex\SchedulerSymfonyLocker'
+      - '@Saloodo\Scheduler\Jobs\Mutex\JobSymfonyLocker'
 
   Saloodo\Scheduler\Command\ListCommand:
     tags: ['console.command']
