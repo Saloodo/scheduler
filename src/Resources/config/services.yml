@@ -23,8 +23,8 @@ services:
     public: true
     arguments:
       - '@event_dispatcher'
-      - '@Saloodo\Scheduler\Jobs\Mutex\SchedulerLocker'
-      - '@Saloodo\Scheduler\Jobs\Mutex\JobLocker'
+      - '@Saloodo\Scheduler\Contract\LockInterface'
+      - '@Saloodo\Scheduler\Contract\LockInterface'
 
   Saloodo\Scheduler\Command\ListCommand:
     tags: ['console.command']
@@ -34,5 +34,3 @@ services:
         - '@Saloodo\Scheduler\Jobs\Scheduler'
         - '@event_dispatcher'
       tags: ['console.command']
-
-
