@@ -23,7 +23,6 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('cache_driver')->end()
-            ->children()
                 ->scalarNode('cache_store')->end()
             ->end();
 
