@@ -10,7 +10,8 @@
   "require": {
     "symfony/framework-bundle": "~3.0|~4.0",
     "dragonmantank/cron-expression": "^2.0",
-    "symfony/process": "~3.0|~4.0"
+    "symfony/process": "~3.0|~4.0",
+    "symfony/lock": "^4.3"
   },
   "require-dev": {
     "phpunit/phpunit": "^7.0",

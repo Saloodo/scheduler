@@ -3,6 +3,7 @@
 namespace Saloodo\Scheduler\Jobs;
 
 use Saloodo\Scheduler\Contract\JobInterface;
+use Saloodo\Scheduler\Contract\LockInterface;
 use Saloodo\Scheduler\Event\JobCompletedEvent;
 use Saloodo\Scheduler\Event\JobFailedEvent;
 use Saloodo\Scheduler\Event\JobSkippedEvent;
@@ -18,7 +19,7 @@ class Scheduler
     private $jobLocker;
     private $jobs = [];
 
-    public function __construct(EventDispatcherInterface $dispatcher = null, SchedulerLocker $schedulerLocker, JobLocker $jobLocker)
+    public function __construct(EventDispatcherInterface $dispatcher = null, LockInterface $schedulerLocker, LockInterface $jobLocker)
     {
         $this->dispatcher = $dispatcher;
         $this->schedulerLocker = $schedulerLocker;

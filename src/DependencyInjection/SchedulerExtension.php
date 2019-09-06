@@ -3,7 +3,9 @@
 namespace Saloodo\Scheduler\DependencyInjection;
 
 use Saloodo\Scheduler\Jobs\Mutex\JobLocker;
+use Saloodo\Scheduler\Jobs\Mutex\JobSymfonyLocker;
 use Saloodo\Scheduler\Jobs\Mutex\SchedulerLocker;
+use Saloodo\Scheduler\Jobs\Mutex\SchedulerSymfonyLocker;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -34,5 +36,11 @@ class SchedulerExtension extends Extension
 
         $definition = $container->getDefinition(JobLocker::class);
         $definition->replaceArgument(0, new Reference($config['cache_driver']));
+
+        $definition = $container->getDefinition(SchedulerSymfonyLocker::class);
+        $definition->replaceArgument(0, new Reference( $config['cache_store']));
+
+        $definition = $container->getDefinition(JobSymfonyLocker::class);
+        $definition->replaceArgument(0, new Reference( $config['cache_store']));
     }
 }

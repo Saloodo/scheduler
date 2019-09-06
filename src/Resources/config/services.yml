@@ -3,11 +3,21 @@ services:
     public: true
     arguments:
         - 'scheduler.cache_driver'
+        -
+  Saloodo\Scheduler\Jobs\Mutex\SchedulerSymfonyLocker:
+    public: true
+    arguments:
+      - 'scheduler.cache_store'
 
   Saloodo\Scheduler\Jobs\Mutex\JobLocker:
     public: true
     arguments:
         - 'scheduler.cache_driver'
+
+  Saloodo\Scheduler\Jobs\Mutex\JobSymfonyLocker:
+    public: true
+    arguments:
+      - 'scheduler.cache_store'
 
   Saloodo\Scheduler\Jobs\Scheduler:
     public: true
@@ -24,3 +34,5 @@ services:
         - '@Saloodo\Scheduler\Jobs\Scheduler'
         - '@event_dispatcher'
       tags: ['console.command']
+
+
