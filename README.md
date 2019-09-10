@@ -27,6 +27,7 @@ composer require saloodo/scheduler
 ```yaml
 scheduler:
   cache_driver: 'app_general_cache'
+  cache_store: 'lock_store_provider'
 ```
 
 ## How do I add jobs to the scheduler?
