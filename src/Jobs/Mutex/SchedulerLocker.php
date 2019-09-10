@@ -12,8 +12,6 @@ class SchedulerLocker implements LockInterface
 {
     protected $cache;
 
-
-
     public function __construct(AdapterInterface $cache)
     {
         $this->cache = $cache;
@@ -28,7 +26,6 @@ class SchedulerLocker implements LockInterface
             $time = new DateTimeImmutable();
         }
         $key = $job->getUniqueId() . '_' . $time->format('Hi');
-
 
         $info = $this->cache->getItem($key);
 

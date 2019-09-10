@@ -18,7 +18,7 @@ class SchedulerSymfonyLocker implements  LockInterface
 
     public function __construct(StoreInterface $store)
     {
-        $this->factory = $store;
+        $this->factory = new Factory($store);
     }
 
     /**
