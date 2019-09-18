@@ -3,6 +3,7 @@
 namespace Saloodo\Scheduler\Jobs;
 
 use Saloodo\Scheduler\Contract\JobInterface;
+use Symfony\Component\Lock\Lock;
 
 abstract class AbstractJob implements JobInterface
 {
@@ -13,6 +14,11 @@ abstract class AbstractJob implements JobInterface
 
     /** @var int */
     private $endTime;
+
+    /**
+     * @var Lock
+     */
+    private $lock;
 
     public function __construct()
     {
@@ -87,6 +93,16 @@ abstract class AbstractJob implements JobInterface
     {
         $this->endTime = $endTime;
         return $this;
+    }
+
+    public function setLock(Lock $lock)
+    {
+       $this->lock = $lock;
+    }
+
+    public function getLock(): Lock
+    {
+        return  $this->lock;
     }
 
     /**

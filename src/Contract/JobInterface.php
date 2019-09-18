@@ -4,6 +4,7 @@
 namespace Saloodo\Scheduler\Contract;
 
 use Saloodo\Scheduler\Jobs\Schedule;
+use Symfony\Component\Lock\Lock;
 
 interface JobInterface
 {
@@ -56,4 +57,15 @@ interface JobInterface
      * @return self
      */
     public function setEndTime(int $endTime): self;
+
+    /**
+     * @param Lock $lock
+     * @return mixed
+     */
+    public  function setLock (Lock $lock);
+
+    /**
+     * @return Lock
+     */
+    public function getLock() :Lock;
 }
