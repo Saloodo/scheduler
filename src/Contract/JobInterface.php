@@ -65,7 +65,7 @@ interface JobInterface
     public  function setLock (Lock $lock);
 
     /**
-     * @return Lock
+     * @return mixed
      */
-    public function getLock() :Lock;
+    public function getLock();
 }

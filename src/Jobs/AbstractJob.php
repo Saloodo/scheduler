@@ -3,7 +3,9 @@
 namespace Saloodo\Scheduler\Jobs;
 
 use Saloodo\Scheduler\Contract\JobInterface;
+use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Lock;
+use Symfony\Component\Lock\Store\FlockStore;
 
 abstract class AbstractJob implements JobInterface
 {
@@ -100,7 +102,7 @@ abstract class AbstractJob implements JobInterface
        $this->lock = $lock;
     }
 
-    public function getLock(): Lock
+    public function getLock()
     {
         return  $this->lock;
     }

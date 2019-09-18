@@ -48,6 +48,9 @@ class SchedulerSymfonyLocker implements LockInterface
      */
     public function unlock(JobInterface $job)
     {
-       return $job->getLock()->release() == null;
+        if(is_null($job->getLock())){
+            return true;
+        }
+        return $job->getLock()->release() == null;
     }
 }

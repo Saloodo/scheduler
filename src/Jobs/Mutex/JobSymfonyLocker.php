@@ -49,6 +49,9 @@ class JobSymfonyLocker implements LockInterface
      */
     public function unlock(JobInterface $job): bool
     {
+        if(is_null($job->getLock())){
+            return true;
+        }
        return $job->getLock()->release() == null;
     }
 }
