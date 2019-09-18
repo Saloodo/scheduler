@@ -5,6 +5,7 @@ namespace Saloodo\Scheduler\Jobs\Mutex;
 use Saloodo\Scheduler\Contract\JobInterface;
 use Saloodo\Scheduler\Contract\LockInterface;
 use Symfony\Component\Lock\Factory;
+use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
 
 
@@ -12,9 +13,14 @@ class JobSymfonyLocker implements LockInterface
 {
     /** @var Factory $factory */
     protected  $factory;
+    /**
+     * @var StoreInterface
+     */
+    protected  $lockStore;
 
     public function __construct(StoreInterface $store)
     {
+        $this->lockStore = $store;
         $this->factory = new Factory($store);
     }
 
@@ -23,8 +29,19 @@ class JobSymfonyLocker implements LockInterface
      */
     public function tryLock(JobInterface $job): bool
     {
-        $lock = $this->factory->createLock($job->getUniqueId(),$job->getSchedule()->getTtl());
-        return  $lock->acquire();
+        /**
+         * Lock $lock
+         */
+        $lock = $this->factory->createLock(
+            $job->getUniqueId(),
+            $job->getSchedule()->getTtl(),
+            false);
+
+        if($lock->acquire()){
+            $job->setLock($lock);
+            return true;
+        }
+       return false;
     }
 
     /**
@@ -32,7 +49,6 @@ class JobSymfonyLocker implements LockInterface
      */
     public function unlock(JobInterface $job): bool
     {
-        $lock = $this->factory->createLock($job->getUniqueId());
-        return $lock->release() == null;
+       return $job->getLock()->release() == null;
     }
 }
