@@ -27,10 +27,13 @@ services:
       - '@Saloodo\Scheduler\Jobs\Mutex\JobSymfonyLocker'
 
   Saloodo\Scheduler\Command\ListCommand:
+    arguments:
+      - '@service_container'
     tags: ['console.command']
 
   Saloodo\Scheduler\Command\RunCommand:
       arguments:
+        - '@service_container'
         - '@Saloodo\Scheduler\Jobs\Scheduler'
         - '@event_dispatcher'
       tags: ['console.command']

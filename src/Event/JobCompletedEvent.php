@@ -3,7 +3,8 @@
 namespace Saloodo\Scheduler\Event;
 
 use Saloodo\Scheduler\Contract\JobInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
+
 
 class JobCompletedEvent extends Event
 {

@@ -2,7 +2,7 @@
 
 namespace Saloodo\Scheduler\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class SchedulerStartedEvent extends Event
 {

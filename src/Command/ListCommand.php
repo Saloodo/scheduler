@@ -4,13 +4,30 @@ namespace Saloodo\Scheduler\Command;
 
 use Saloodo\Scheduler\Contract\JobInterface;
 use Saloodo\Scheduler\Jobs\Scheduler;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ListCommand extends ContainerAwareCommand
+class ListCommand extends Command
 {
+    /** @var ContainerInterface */
+    private $container;
+
+    /**
+     * ListCommand constructor.
+     * @param ContainerInterface $container
+     * @param string|null $name
+     */
+    public function __construct(ContainerInterface $container, string $name = null)
+    {
+        $this->container = $container;
+
+        parent::__construct($name);
+    }
+
+
     /**
      * @inheritdoc
      */
@@ -27,7 +44,7 @@ class ListCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $scheduler = $this->getContainer()->get(Scheduler::class);
+        $scheduler = $this->container->get(Scheduler::class);
         $table = new Table($output);
         $table->setHeaders([
             "ID",

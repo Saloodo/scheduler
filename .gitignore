@@ -7,5 +7,6 @@
 /.settings
 
 # Managed by Composer
+composer.lock
 /var/bootstrap.php.cache
 /vendor/
