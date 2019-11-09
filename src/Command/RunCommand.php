@@ -2,7 +2,6 @@
 
 namespace Saloodo\Scheduler\Command;
 
-use Lexik\Bundle\JWTAuthenticationBundle\Events;
 use Saloodo\Scheduler\Contract\JobInterface;
 use Saloodo\Scheduler\Event\JobSkippedEvent;
 use Saloodo\Scheduler\Event\SchedulerCompletedEvent;
@@ -137,15 +136,18 @@ class RunCommand extends Command
         $phpBinaryFinder = new PhpExecutableFinder();
         $phpBinaryPath = $phpBinaryFinder->find();
         $symfonyPath = $this->getApplication()->getKernel()->getProjectDir();
+        $command = sprintf(
+            '%s %s/bin/console jobs:run %s --env=%s',
+            $phpBinaryPath,
+            $symfonyPath,
+            $job->getUniqueId(),
+            $this->environment);
 
-        $process = new Process(
-            sprintf(
-                '%s %s/bin/console jobs:run %s --env=%s',
-                $phpBinaryPath,
-                $symfonyPath,
-                $job->getUniqueId(),
-                $this->environment)
-        );
+        if (method_exists(Process::class, 'fromShellCommandline')) {
+            $process = Process::fromShellCommandline($command);
+        } else {
+            $process = new Process($command);
+        }
 
         $process->setTimeout(null);
 
@@ -204,7 +206,7 @@ class RunCommand extends Command
      */
     protected function dispatch($eventName, $eventObject)
     {
-        if ($this->eventDispatcher instanceof ContractsEventDispatcherInterface) {
+        if (interface_exists(ContractsEventDispatcherInterface::class)) {
             $this->eventDispatcher->dispatch($eventObject, $eventName);
         } else {
             $this->eventDispatcher->dispatch($eventName, $eventObject);

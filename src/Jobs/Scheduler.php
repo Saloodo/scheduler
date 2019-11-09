@@ -114,7 +114,7 @@ class Scheduler
      */
     protected function dispatch($eventName, $eventObject)
     {
-        if ($this->dispatcher instanceof ContractsEventDispatcherInterface) {
+        if (interface_exists(ContractsEventDispatcherInterface::class)) {
             $this->dispatcher->dispatch($eventObject, $eventName);
         } else {
             $this->dispatcher->dispatch($eventName, $eventObject);

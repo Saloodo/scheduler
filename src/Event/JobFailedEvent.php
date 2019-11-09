@@ -3,7 +3,6 @@
 namespace Saloodo\Scheduler\Event;
 
 use Saloodo\Scheduler\Contract\JobInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 use Throwable;
 
 class JobFailedEvent extends Event
