@@ -12,7 +12,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -30,21 +29,18 @@ class RunCommand extends Command
     /** @var string */
     private $environment;
 
-    /** @var ContainerInterface */
-    private $container;
-
     /**
      * @inheritdoc
      */
     public function __construct(
-        ContainerInterface $container,
         Scheduler $scheduler,
         EventDispatcherInterface $eventDispatcher,
+        string $environment,
         ?string $name = null
     ) {
-        $this->container = $container;
         $this->scheduler = $scheduler;
         $this->eventDispatcher = $eventDispatcher;
+        $this->environment = $environment;
 
         parent::__construct($name);
     }
@@ -59,15 +55,6 @@ class RunCommand extends Command
             ->setDescription("Run due jobs")
             ->addArgument("id", InputArgument::OPTIONAL, "The ID of the task.")
             ->addOption('force', null, InputOption::VALUE_OPTIONAL, 'Whether execution of all jobs should be forced', false);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function initialize(InputInterface $input, OutputInterface $output)
-    {
-        $this->environment = $this->container->getParameter('kernel.environment');
-        parent::initialize($input, $output);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

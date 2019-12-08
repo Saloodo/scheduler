@@ -33,7 +33,7 @@ services:
 
   Saloodo\Scheduler\Command\RunCommand:
       arguments:
-        - '@service_container'
         - '@Saloodo\Scheduler\Jobs\Scheduler'
         - '@event_dispatcher'
+        - '%kernel.environment%'
       tags: ['console.command']
