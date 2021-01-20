@@ -11,6 +11,7 @@ use Saloodo\Scheduler\Event\JobStartedEvent;
 use Saloodo\Scheduler\Jobs\Mutex\JobLocker;
 use Saloodo\Scheduler\Jobs\Mutex\SchedulerLocker;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 
 class Scheduler
 {
@@ -42,19 +43,19 @@ class Scheduler
     public function run(JobInterface $job)
     {
         $job->setStartTime(microtime(true));
-        $this->dispatcher->dispatch(JobStartedEvent::NAME, new JobStartedEvent($job));
+        $this->dispatch(JobStartedEvent::NAME, new JobStartedEvent($job));
 
         try {
             $job->run();
         } catch (\Throwable $e) {
-            $this->dispatcher->dispatch(JobFailedEvent::NAME, new JobFailedEvent($job, $e));
+            $this->dispatch(JobFailedEvent::NAME, new JobFailedEvent($job, $e));
         } finally {
             // always tries to delete the cache, even if job was not locked.
             $this->jobLocker->unlock($job);
         }
 
         $job->setEndTime(microtime(true));
-        $this->dispatcher->dispatch(JobCompletedEvent::NAME, new JobCompletedEvent($job));
+        $this->dispatch(JobCompletedEvent::NAME, new JobCompletedEvent($job));
     }
 
     /**
@@ -103,5 +104,20 @@ class Scheduler
         }
 
         return $dueJobs;
+    }
+
+    /**
+     * This method for resolve Deprecations from Symfony 4.2
+     *
+     * @param $eventName
+     * @param $eventObject
+     */
+    protected function dispatch($eventName, $eventObject)
+    {
+        if (interface_exists(ContractsEventDispatcherInterface::class)) {
+            $this->dispatcher->dispatch($eventObject, $eventName);
+        } else {
+            $this->dispatcher->dispatch($eventName, $eventObject);
+        }
     }
 }

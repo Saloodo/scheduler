@@ -7,17 +7,18 @@ use Saloodo\Scheduler\Event\JobSkippedEvent;
 use Saloodo\Scheduler\Event\SchedulerCompletedEvent;
 use Saloodo\Scheduler\Event\SchedulerStartedEvent;
 use Saloodo\Scheduler\Jobs\Scheduler;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
-class RunCommand extends ContainerAwareCommand
+class RunCommand extends Command
 {
     /** @var Scheduler */
     private $scheduler;
@@ -31,10 +32,15 @@ class RunCommand extends ContainerAwareCommand
     /**
      * @inheritdoc
      */
-    public function __construct(Scheduler $scheduler, EventDispatcherInterface $eventDispatcher, ?string $name = null)
-    {
+    public function __construct(
+        Scheduler $scheduler,
+        EventDispatcherInterface $eventDispatcher,
+        string $environment,
+        ?string $name = null
+    ) {
         $this->scheduler = $scheduler;
         $this->eventDispatcher = $eventDispatcher;
+        $this->environment = $environment;
 
         parent::__construct($name);
     }
@@ -49,15 +55,6 @@ class RunCommand extends ContainerAwareCommand
             ->setDescription("Run due jobs")
             ->addArgument("id", InputArgument::OPTIONAL, "The ID of the task.")
             ->addOption('force', null, InputOption::VALUE_OPTIONAL, 'Whether execution of all jobs should be forced', false);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function initialize(InputInterface $input, OutputInterface $output)
-    {
-        $this->environment = $this->getContainer()->getParameter('kernel.environment');
-        parent::initialize($input, $output);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -82,7 +79,7 @@ class RunCommand extends ContainerAwareCommand
      */
     protected function runJobs(bool $force, Callable $callable = null)
     {
-        $this->eventDispatcher->dispatch(SchedulerStartedEvent::NAME, new SchedulerStartedEvent());
+        $this->dispatch(SchedulerStartedEvent::NAME, new SchedulerStartedEvent());
 
         $allProcesses = [];
 
@@ -95,7 +92,7 @@ class RunCommand extends ContainerAwareCommand
 
         $this->waitForProcesses($allProcesses);
 
-        $this->eventDispatcher->dispatch(SchedulerCompletedEvent::NAME, new SchedulerCompletedEvent());
+        $this->dispatch(SchedulerCompletedEvent::NAME, new SchedulerCompletedEvent());
 
         if (is_callable($callable)) {
             call_user_func($callable, $allProcesses);
@@ -106,14 +103,14 @@ class RunCommand extends ContainerAwareCommand
     {
         if ($job->getSchedule()->checkShouldRunOnOnlyOneInstance()) {
             if (!$this->scheduler->serverShouldRun($job)) {
-                $this->eventDispatcher->dispatch(JobSkippedEvent::NAME, new JobSkippedEvent($job, JobSkippedEvent::SERVER_SHOULD_NOT_RUN));
+                $this->dispatch(JobSkippedEvent::NAME, new JobSkippedEvent($job, JobSkippedEvent::SERVER_SHOULD_NOT_RUN));
                 return false;
             }
         }
 
         if (!$job->getSchedule()->checkCanOverlap()) {
             if ($this->scheduler->wouldOverlap($job)) {
-                $this->eventDispatcher->dispatch(JobSkippedEvent::NAME, new JobSkippedEvent($job, JobSkippedEvent::WOULD_OVERLAP));
+                $this->dispatch(JobSkippedEvent::NAME, new JobSkippedEvent($job, JobSkippedEvent::WOULD_OVERLAP));
                 return false;
             }
         }
@@ -126,15 +123,18 @@ class RunCommand extends ContainerAwareCommand
         $phpBinaryFinder = new PhpExecutableFinder();
         $phpBinaryPath = $phpBinaryFinder->find();
         $symfonyPath = $this->getApplication()->getKernel()->getProjectDir();
+        $command = sprintf(
+            '%s %s/bin/console jobs:run %s --env=%s',
+            $phpBinaryPath,
+            $symfonyPath,
+            $job->getUniqueId(),
+            $this->environment);
 
-        $process = new Process(
-            sprintf(
-                '%s %s/bin/console jobs:run %s --env=%s',
-                $phpBinaryPath,
-                $symfonyPath,
-                $job->getUniqueId(),
-                $this->environment)
-        );
+        if (method_exists(Process::class, 'fromShellCommandline')) {
+            $process = Process::fromShellCommandline($command);
+        } else {
+            $process = new Process($command);
+        }
 
         $process->setTimeout(null);
 
@@ -182,6 +182,21 @@ class RunCommand extends ContainerAwareCommand
             if (!$process->isSuccessful()) {
                 throw new ProcessFailedException($process);
             }
+        }
+    }
+
+    /**
+     * This method for resolve Deprecations from Symfony 4.2
+     *
+     * @param $eventName
+     * @param $eventObject
+     */
+    protected function dispatch($eventName, $eventObject)
+    {
+        if (interface_exists(ContractsEventDispatcherInterface::class)) {
+            $this->eventDispatcher->dispatch($eventObject, $eventName);
+        } else {
+            $this->eventDispatcher->dispatch($eventName, $eventObject);
         }
     }
 }

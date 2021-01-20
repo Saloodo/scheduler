@@ -11,7 +11,7 @@
     "symfony/framework-bundle": "~3.0|~4.0",
     "dragonmantank/cron-expression": "^2.0",
     "symfony/process": "~3.0|~4.0",
-    "symfony/lock": "3.4.*"
+    "symfony/lock": "~3.0|~4.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^7.0",
@@ -19,6 +19,7 @@
     "sensio/framework-extra-bundle": "^3.0.2",
     "monolog/monolog": "^1.23"
   },
+  "minimum-stability": "dev",
   "authors": [
     {
       "name": "Leonardo Beal",
