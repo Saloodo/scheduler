@@ -17,31 +17,31 @@ class JobSymfonyLockerTest extends TestCase
     public function testCanLockJob()
     {
         $job = new JobExample();
-        $this->assertTrue($this->jobLocker->tryLock($job));
+        self::assertTrue($this->jobLocker->tryLock($job));
     }
 
     public function testCanUnlockJob()
     {
         $job = new JobExample();
         $this->jobLocker->tryLock($job);
-        $this->assertTrue($this->jobLocker->unlock($job));
+        self::assertTrue($this->jobLocker->unlock($job));
     }
 
     public function testCanNOTLockAlreadyLockedJob()
     {
         $job = new JobExample();
 
-        $this->assertTrue($this->jobLocker->tryLock($job));
-        $this->assertFalse($this->jobLocker->tryLock($job));
+        self::assertTrue($this->jobLocker->tryLock($job));
+        self::assertFalse($this->jobLocker->tryLock($job));
     }
 
     public function testCanLockJobAfterUnlock()
     {
         $job = new JobExample();
 
-        $this->assertTrue($this->jobLocker->tryLock($job));
-        $this->assertTrue($this->jobLocker->unlock($job));
-        $this->asserttrue($this->jobLocker->tryLock($job));
+        self::assertTrue($this->jobLocker->tryLock($job));
+        self::assertTrue($this->jobLocker->unlock($job));
+        self::asserttrue($this->jobLocker->tryLock($job));
     }
 
     protected function setUp()

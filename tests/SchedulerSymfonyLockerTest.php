@@ -18,28 +18,28 @@ class SchedulerSymfonyLockerTest extends TestCase
     public function testCanLockSchedulerJobs()
     {
         $job = new JobExample();
-        $this->assertTrue($this->schedulerLocker->tryLock($job));
+        self::assertTrue($this->schedulerLocker->tryLock($job));
     }
 
     public function testCanUnlockSchedulerJobs()
     {
         $job = new JobExample();
-        $this->assertTrue($this->schedulerLocker->tryLock($job));
-        $this->assertTrue($this->schedulerLocker->unlock($job));
+        self::assertTrue($this->schedulerLocker->tryLock($job));
+        self::assertTrue($this->schedulerLocker->unlock($job));
     }
 
     public function testCanNOTLockAlreadyLockedSchedulerJobs()
     {
         $job = new JobExample();
-        $this->assertTrue($this->schedulerLocker->tryLock($job));
-        $this->assertFalse($this->schedulerLocker->trylock($job));
+        self::assertTrue($this->schedulerLocker->tryLock($job));
+        self::assertFalse($this->schedulerLocker->trylock($job));
     }
 
     public  function testCanLockSchedulerJobAfterUnLockIt(){
         $job = new JobExample();
-        $this->assertTrue($this->schedulerLocker->tryLock($job));
-        $this->assertTrue($this->schedulerLocker->unlock($job));
-        $this->assertTrue($this->schedulerLocker->tryLock($job));
+        self::assertTrue($this->schedulerLocker->tryLock($job));
+        self::assertTrue($this->schedulerLocker->unlock($job));
+        self::assertTrue($this->schedulerLocker->tryLock($job));
     }
 
     public function testCanNotLockTheSameJobAtTheSameMin()
@@ -47,11 +47,11 @@ class SchedulerSymfonyLockerTest extends TestCase
         $job = new JobExample();
         $time = new DateTime(date("h:i"));
 
-        $this->assertTrue($this->schedulerLocker->tryLock($job, $time));
+        self::assertTrue($this->schedulerLocker->tryLock($job, $time));
 
         $time->add(new DateInterval("PT59S"));
 
-        $this->assertFalse($this->schedulerLocker->tryLock($job,$time));
+        self::assertFalse($this->schedulerLocker->tryLock($job,$time));
     }
 
     protected function setUp()

@@ -14,7 +14,7 @@ class FrequencyTest extends TestCase
 
         $schedule->everyFiveMinutes();
 
-        $this->assertEquals("*/5 * * * *", $schedule->getExpression());
+        self::assertEquals("*/5 * * * *", $schedule->getExpression());
     }
 
     public function testCanScheduleEvery10Minutes()
@@ -23,7 +23,7 @@ class FrequencyTest extends TestCase
 
         $schedule->everyTenMinutes();
 
-        $this->assertEquals("*/10 * * * *", $schedule->getExpression());
+        self::assertEquals("*/10 * * * *", $schedule->getExpression());
     }
 
     public function testCanScheduleEvery15Minutes()
@@ -32,7 +32,7 @@ class FrequencyTest extends TestCase
 
         $schedule->everyFifteenMinutes();
 
-        $this->assertEquals("*/15 * * * *", $schedule->getExpression());
+        self::assertEquals("*/15 * * * *", $schedule->getExpression());
     }
 
     public function testCanScheduleEvery30Minutes()
@@ -41,7 +41,7 @@ class FrequencyTest extends TestCase
 
         $schedule->everyThirtyMinutes();
 
-        $this->assertEquals("*/30 * * * *", $schedule->getExpression());
+        self::assertEquals("*/30 * * * *", $schedule->getExpression());
     }
 
     public function testCanScheduleEveryHour()
@@ -50,7 +50,7 @@ class FrequencyTest extends TestCase
 
         $schedule->hourly();
 
-        $this->assertEquals("0 * * * *", $schedule->getExpression());
+        self::assertEquals("0 * * * *", $schedule->getExpression());
     }
 
     public function testCanScheduleEveryDay()
@@ -59,7 +59,7 @@ class FrequencyTest extends TestCase
 
         $schedule->daily();
 
-        $this->assertEquals("0 0 * * *", $schedule->getExpression());
+        self::assertEquals("0 0 * * *", $schedule->getExpression());
     }
 
     public function testCanScheduleEveryDayAt23()
@@ -68,7 +68,7 @@ class FrequencyTest extends TestCase
 
         $schedule->daily()->atHour(23);
 
-        $this->assertEquals("0 23 * * *", $schedule->getExpression());
+        self::assertEquals("0 23 * * *", $schedule->getExpression());
     }
 
     public function testCanScheduleMonthly()
@@ -78,7 +78,7 @@ class FrequencyTest extends TestCase
         //runs on the first
         $schedule->monthly();
 
-        $this->assertEquals("0 0 1 * *", $schedule->getExpression());
+        self::assertEquals("0 0 1 * *", $schedule->getExpression());
     }
 
     public function testCanScheduleMonthlyOnThe10th()
@@ -87,7 +87,7 @@ class FrequencyTest extends TestCase
 
         $schedule->monthly()->atDay(10);
 
-        $this->assertEquals("0 0 10 * *", $schedule->getExpression());
+        self::assertEquals("0 0 10 * *", $schedule->getExpression());
     }
 
     public function testCanScheduleMonthlyOnThe10thAt16()
@@ -96,17 +96,17 @@ class FrequencyTest extends TestCase
 
         $schedule->monthly()->atDay(10)->atHour(16);
 
-        $this->assertEquals("0 16 10 * *", $schedule->getExpression());
+        self::assertEquals("0 16 10 * *", $schedule->getExpression());
     }
 
     public function testSetExpresion()
     {
         $schedule = new Schedule();
 
-        $this->assertEquals("* * * * *", $schedule->getExpression());
+        self::assertEquals("* * * * *", $schedule->getExpression());
 
         $schedule->setExpression("* 11,17 * * *");
 
-        $this->assertEquals("* 11,17 * * *", $schedule->getExpression());
+        self::assertEquals("* 11,17 * * *", $schedule->getExpression());
     }
 }
