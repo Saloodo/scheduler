@@ -1,14 +1,10 @@
 language: php
 sudo: false
-php:
-  - 7.1
+php
   - 7.2
-  - 7.3
 
 matrix:
   include:
-    - php: 7.1
-      env: SYMFONY_VERSION='3.4.*'
     - php: 7.2
       env: DEPENDENCIES='dev' SYMFONY_VERSION='3.4.*@dev'
     - php: 7.2
